@@ -30,7 +30,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         y = np.zeros((self.batch_size, *self.image_size, 1))
 
         for i, file in enumerate(batch_files):
-            img = cv2.imread(f'C:/Users/smolt/PycharmProjects/test_task_winstarts.ai/{file}')
+            img = cv2.imread(f'C:/Users/smolt/PycharmProjects/airbus_ship_detection_test/{file}')
             mask = self.__masks_from_file(file)
 
             X[i,] = cv2.resize(img, self.image_size)

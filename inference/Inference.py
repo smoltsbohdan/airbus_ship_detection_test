@@ -1,35 +1,54 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
+import random
 from train_model.TrainModel import train_model
+
+# Інференс для тестових зображень
 
 model, train_df = train_model()
 
+# Визначення кількості зображень для виведення
+num_images_to_display = 5
 
-# Інференс для тестових зображень
-random_row = train_df.sample(random_state=42)
-image_id = random_row['ImageId'].values[0]
-image_path = f'{image_id}'
-test_image = cv2.imread(image_path)
-test_image_resized = cv2.resize(test_image, (256, 256)) / 255.0
-test_image_resized = np.expand_dims(test_image_resized, axis=0)
+# Ініціалізація пустого списку для збереження результатів
+display_images = []
+display_predictions = []
 
-if test_image_resized.dtype != np.uint8:
-    test_image_resized = (test_image_resized * 255).astype(np.uint8)
+# Визначення кількості зображень для виведення
+num_images_to_display = 5
 
-# Отримання сегментаційної маски
-predictions = model.predict(test_image_resized)
+# Отримання випадкових індексів
+random_indices = random.sample(range(len(train_df)), num_images_to_display)
 
-if predictions.dtype != np.uint8:
-    predictions = (predictions * 255).astype(np.uint8)
+# Ініціалізація списку для збереження результатів
+display_images = []
+display_predictions = []
 
-# Відображення оригінального зображення та сегментаційної маски поруч
-plt.subplot(1, 2, 1)
-plt.imshow(test_image_resized[0])
-plt.title('Original Image')
+# Отримання випадкових зображень та їх передбачень
+for index in random_indices:
+    image_id = train_df.iloc[index]['ImageId']
+    image_path = f'C:/Users/smolt/PycharmProjects/airbus_ship_detection_test/{image_id}'
+    test_image = cv2.imread(image_path)
+    test_image_resized = cv2.resize(test_image, (256, 256)) / 255.0
+    test_image_resized = np.expand_dims(test_image_resized, axis=0)
 
-plt.subplot(1, 2, 2)
-plt.imshow(predictions[0, :, :, 0], cmap='gray')
-plt.title('Segmentation Mask')
+    # Отримання сегментаційної маски
+    predictions = model.predict(test_image_resized)
+
+    # Збереження зображення та його передбачення
+    display_images.append(test_image_resized[0])
+    display_predictions.append(predictions[0, :, :, 0])
+
+# Відображення зображень та їх передбачень
+plt.figure(figsize=(15, 5))
+for i in range(num_images_to_display):
+    plt.subplot(2, num_images_to_display, i + 1)
+    plt.imshow(display_images[i])
+    plt.title(f'Image {i + 1}')
+
+    plt.subplot(2, num_images_to_display, i + 1 + num_images_to_display)
+    plt.imshow(display_predictions[i])
+    plt.title(f'Prediction {i + 1}')
+
 plt.show()
-

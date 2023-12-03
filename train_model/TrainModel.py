@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 
 
 def train_model():
-    # Отримання повного або абсолютного шляху до файлу
+    # Отримання абсолютного шляху до файлу
     file_path = os.path.join(os.path.dirname(__file__), "..", "data_files", "train_ship_segmentations_v2.csv")
 
     # Перевірка наявності файлу
@@ -54,5 +54,5 @@ def train_model():
     val_generator = DataGenerator(val_files, batch_size=16, train_df=train_df)
 
     # Навчання моделі
-    model.fit(train_generator, epochs=5, validation_data=val_generator)
+    model.fit(train_generator, epochs=2, validation_data=val_generator)
     return model, train_df
